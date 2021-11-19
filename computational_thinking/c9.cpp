@@ -1,52 +1,44 @@
 #include <iostream>
-#include <algorithm>
+#include <vector>
 using namespace std;
 
-typedef struct _applicant{
-    int review;
-    int test;
-} applicant;
-
-int group[8001][8001] = {{0,},};
+vector<vector<int> > group(8001);
 bool checked[8001] = {0,};
 
-void party(int p, int n){
-    if(checked[p]) return;
-    checked[p] = true;
-    for(int i = 0; i < n; i++){
-        if(group[p][i])
-            party(i, n);
-    }
+void check(int p){
+  if(checked[p]) return;
+  checked[p] = true;
+  for(int i = 0; i < group[p].size(); i++)
+    check(group[p][i]);
 }
 
 int main()
 {
-    int n;
-    cin >> n;
+  int n;
+  cin >> n;
 
-    applicant p[8001];
-    for(int i = 0; i < n; i++)
-        cin >> p[i].review >> p[i].test;
+  int review[8001], test[8001];
+  for(int i = 0; i < n; i++)
+    cin >> review[i] >> test[i];
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
-            if((p[i].review > p[j].review && p[i].test < p[j].test) || 
-               (p[i].review < p[j].review && p[i].test > p[j].test)){
-                   group[i][j] = 1;
-                   group[j][i] = 1;
-               }
+  for(int i = 0; i < n; i++){
+    for(int j = i+1; j < n; j++){
+      if((review[i] > review[j] && test[i] < test[j]) 
+      || (review[i] < review[j] && test[i] > test[j]) ){
+          group[i].push_back(j);
+          group[j].push_back(i);
         }
     }
+  }
 
-    int result = 0;
-    for(int i = 0; i < n; i++){
-        if(!checked[i]){
-            party(i, n);
-            result ++;
-        }
+  int result = 0;
+  for(int i = 0; i < n; i++){
+    if(!checked[i]){
+        check(i);
+        result++;
     }
+  }
+  cout << result << "\n";
 
-    cout << result << "\n";
-
-    return 0;
+  return 0;
 }
